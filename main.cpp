@@ -1,29 +1,32 @@
 #include <iostream>
 #include <thread>
-#include <pthread.h>
-#include "tcpserver.h"
-void clntHander(TCPServer * server, SOCKET clntSock);
+// #include "wtcpserver.h"
+#include "ltcpserver.h"
+// void clntHander(WTCPServer * server, SOCKET clntSock);
+void clntHander(LTCPServer * server, int clntSock);
 
 int main(int, char**) {
     std::vector<std::thread> threadPool;
-    TCPServer * server = new TCPServer();
+    // WTCPServer * server = new WTCPServer();
+    LTCPServer * server = new LTCPServer();
     server->start();
 
     while (true)
     {
         std::cout << "waiting for clients.." << std::endl;
-        SOCKET clntSock = server->acceptClient();
+        // SOCKET clntSock = server->acceptClient();
+        int clntSock = server->acceptClient();
         std::cout << clntSock << std::endl;
         std::thread clntThread(clntHander, server, clntSock);
-        threadPool.push_back(clntThread);
+        clntThread.detach();
     }
 }
 
-void clntHander(TCPServer * server, SOCKET clntSock)
+// void clntHander(WTCPServer * server, SOCKET clntSock)
+void clntHander(LTCPServer * server, int clntSock)
 {
     while (true)
     {
-        Encode * ecd = NULL;
         Decode * dcd = NULL;
         server->receiveData(clntSock, dcd);
 
@@ -36,13 +39,11 @@ void clntHander(TCPServer * server, SOCKET clntSock)
         {
           DecodeChat chat((DecodeTCP *)dcd);
           std::cout << "client : " << chat.Msg() << std::endl;
-          ecd = new EncodeChat(chat.Msg());
-          server->sendData(clntSock, ecd); 
+          EncodeChat ecd(chat.Msg());
+          server->sendData(clntSock, &ecd); 
         } break;
         }
 
         delete dcd;
-        if (ecd != NULL)
-            delete ecd;
     }
 }

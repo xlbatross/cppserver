@@ -8,10 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "C:/Users/user/Desktop/cppServer/decode.cpp" "CMakeFiles/cppserver.dir/decode.cpp.obj" "gcc" "CMakeFiles/cppserver.dir/decode.cpp.obj.d"
-  "C:/Users/user/Desktop/cppServer/encode.cpp" "CMakeFiles/cppserver.dir/encode.cpp.obj" "gcc" "CMakeFiles/cppserver.dir/encode.cpp.obj.d"
-  "C:/Users/user/Desktop/cppServer/main.cpp" "CMakeFiles/cppserver.dir/main.cpp.obj" "gcc" "CMakeFiles/cppserver.dir/main.cpp.obj.d"
-  "C:/Users/user/Desktop/cppServer/tcpserver.cpp" "CMakeFiles/cppserver.dir/tcpserver.cpp.obj" "gcc" "CMakeFiles/cppserver.dir/tcpserver.cpp.obj.d"
+  "/Users/xlbatross/cpp/cppserver/decode.cpp" "CMakeFiles/cppserver.dir/decode.cpp.o" "gcc" "CMakeFiles/cppserver.dir/decode.cpp.o.d"
+  "/Users/xlbatross/cpp/cppserver/encode.cpp" "CMakeFiles/cppserver.dir/encode.cpp.o" "gcc" "CMakeFiles/cppserver.dir/encode.cpp.o.d"
+  "/Users/xlbatross/cpp/cppserver/ltcpserver.cpp" "CMakeFiles/cppserver.dir/ltcpserver.cpp.o" "gcc" "CMakeFiles/cppserver.dir/ltcpserver.cpp.o.d"
+  "/Users/xlbatross/cpp/cppserver/main.cpp" "CMakeFiles/cppserver.dir/main.cpp.o" "gcc" "CMakeFiles/cppserver.dir/main.cpp.o.d"
   )
 
 # Targets to which this target links.

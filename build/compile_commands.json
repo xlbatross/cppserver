@@ -1,22 +1,22 @@
 [
 {
-  "directory": "C:/Users/user/Desktop/cppServer/build",
-  "command": "C:\\Qt\\Tools\\mingw810_64\\bin\\g++.exe  @CMakeFiles/cppserver.dir/includes_CXX.rsp -g -o CMakeFiles\\cppserver.dir\\main.cpp.obj -c C:\\Users\\user\\Desktop\\cppServer\\main.cpp",
-  "file": "C:/Users/user/Desktop/cppServer/main.cpp"
+  "directory": "/Users/xlbatross/cpp/cppserver/build",
+  "command": "/usr/bin/clang++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -mmacosx-version-min=13.0 -std=gnu++17 -o CMakeFiles/cppserver.dir/main.cpp.o -c /Users/xlbatross/cpp/cppserver/main.cpp",
+  "file": "/Users/xlbatross/cpp/cppserver/main.cpp"
 },
 {
-  "directory": "C:/Users/user/Desktop/cppServer/build",
-  "command": "C:\\Qt\\Tools\\mingw810_64\\bin\\g++.exe  @CMakeFiles/cppserver.dir/includes_CXX.rsp -g -o CMakeFiles\\cppserver.dir\\tcpserver.cpp.obj -c C:\\Users\\user\\Desktop\\cppServer\\tcpserver.cpp",
-  "file": "C:/Users/user/Desktop/cppServer/tcpserver.cpp"
+  "directory": "/Users/xlbatross/cpp/cppserver/build",
+  "command": "/usr/bin/clang++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -mmacosx-version-min=13.0 -std=gnu++17 -o CMakeFiles/cppserver.dir/encode.cpp.o -c /Users/xlbatross/cpp/cppserver/encode.cpp",
+  "file": "/Users/xlbatross/cpp/cppserver/encode.cpp"
 },
 {
-  "directory": "C:/Users/user/Desktop/cppServer/build",
-  "command": "C:\\Qt\\Tools\\mingw810_64\\bin\\g++.exe  @CMakeFiles/cppserver.dir/includes_CXX.rsp -g -o CMakeFiles\\cppserver.dir\\encode.cpp.obj -c C:\\Users\\user\\Desktop\\cppServer\\encode.cpp",
-  "file": "C:/Users/user/Desktop/cppServer/encode.cpp"
+  "directory": "/Users/xlbatross/cpp/cppserver/build",
+  "command": "/usr/bin/clang++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -mmacosx-version-min=13.0 -std=gnu++17 -o CMakeFiles/cppserver.dir/decode.cpp.o -c /Users/xlbatross/cpp/cppserver/decode.cpp",
+  "file": "/Users/xlbatross/cpp/cppserver/decode.cpp"
 },
 {
-  "directory": "C:/Users/user/Desktop/cppServer/build",
-  "command": "C:\\Qt\\Tools\\mingw810_64\\bin\\g++.exe  @CMakeFiles/cppserver.dir/includes_CXX.rsp -g -o CMakeFiles\\cppserver.dir\\decode.cpp.obj -c C:\\Users\\user\\Desktop\\cppServer\\decode.cpp",
-  "file": "C:/Users/user/Desktop/cppServer/decode.cpp"
+  "directory": "/Users/xlbatross/cpp/cppserver/build",
+  "command": "/usr/bin/clang++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -mmacosx-version-min=13.0 -std=gnu++17 -o CMakeFiles/cppserver.dir/ltcpserver.cpp.o -c /Users/xlbatross/cpp/cppserver/ltcpserver.cpp",
+  "file": "/Users/xlbatross/cpp/cppserver/ltcpserver.cpp"
 }
 ]

@@ -1,16 +1,14 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/cppserver.dir/decode.cpp.obj"
-  "CMakeFiles/cppserver.dir/decode.cpp.obj.d"
-  "CMakeFiles/cppserver.dir/encode.cpp.obj"
-  "CMakeFiles/cppserver.dir/encode.cpp.obj.d"
-  "CMakeFiles/cppserver.dir/main.cpp.obj"
-  "CMakeFiles/cppserver.dir/main.cpp.obj.d"
-  "CMakeFiles/cppserver.dir/tcpserver.cpp.obj"
-  "CMakeFiles/cppserver.dir/tcpserver.cpp.obj.d"
-  "cppserver.exe"
-  "cppserver.exe.manifest"
+  "CMakeFiles/cppserver.dir/decode.cpp.o"
+  "CMakeFiles/cppserver.dir/decode.cpp.o.d"
+  "CMakeFiles/cppserver.dir/encode.cpp.o"
+  "CMakeFiles/cppserver.dir/encode.cpp.o.d"
+  "CMakeFiles/cppserver.dir/ltcpserver.cpp.o"
+  "CMakeFiles/cppserver.dir/ltcpserver.cpp.o.d"
+  "CMakeFiles/cppserver.dir/main.cpp.o"
+  "CMakeFiles/cppserver.dir/main.cpp.o.d"
+  "cppserver"
   "cppserver.pdb"
-  "libcppserver.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.

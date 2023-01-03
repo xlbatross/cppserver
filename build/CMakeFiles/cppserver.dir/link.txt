@@ -1,3 +1,1 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\cppserver.dir/objects.a
-C:\Qt\Tools\mingw810_64\bin\ar.exe qc CMakeFiles\cppserver.dir/objects.a @CMakeFiles\cppserver.dir\objects1
-C:\Qt\Tools\mingw810_64\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\cppserver.dir/objects.a -Wl,--no-whole-archive -o cppserver.exe -Wl,--out-implib,libcppserver.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\cppserver.dir\linkLibs.rsp
+/usr/bin/clang++ -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -mmacosx-version-min=13.0 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cppserver.dir/main.cpp.o CMakeFiles/cppserver.dir/encode.cpp.o CMakeFiles/cppserver.dir/decode.cpp.o CMakeFiles/cppserver.dir/ltcpserver.cpp.o -o cppserver 
