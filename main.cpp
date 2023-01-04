@@ -9,7 +9,6 @@ int main(int, char**) {
     WTCPServer * server = new WTCPServer();
     // LTCPServer * server = new LTCPServer();
     server->start();
-
     while (true)
     {
         std::cout << "waiting for clients.." << std::endl;

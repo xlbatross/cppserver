@@ -12,7 +12,6 @@ class Decode
 public:
     enum Type {Chat};
     Decode();
-
     const int Type();
     const vector<vector<char>> & DataBytesList();
 

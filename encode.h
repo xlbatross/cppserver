@@ -24,8 +24,10 @@ public:
 
 protected:
     vector<vector<char>> dataBytesList;
+
     int headerSize = 0;
     char * headerBytes = NULL;
+    
     int dataSize = 0;
     char * dataBytes = NULL;
 };

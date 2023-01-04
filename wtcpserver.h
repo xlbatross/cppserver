@@ -27,10 +27,8 @@ public:
     
 private:
     WSADATA wsaData;
-
     SOCKET servSock;
     SOCKADDR_IN servAddr;
-
     std::map<SOCKET, SOCKADDR_IN> clients;
 };
 

@@ -20,10 +20,8 @@ public:
 
     void start(int port = 2500);
     int acceptClient();
-
     int receiveBytes(const int clntSock, char * & rawData);
     bool receiveData(const int clntSock, Decode * & dcd);
-
     int sendBytes(const int clntSock, const char *headerBytes, const int headerSize, const char *dataBytes, const int dataSize);
     bool sendData(const int clntSock, Encode * ecd);
     
