@@ -1,29 +1,28 @@
 #include <iostream>
 #include <thread>
-// #include "wtcpserver.h"
-#include "ltcpserver.h"
-// void clntHander(WTCPServer * server, SOCKET clntSock);
-void clntHander(LTCPServer * server, int clntSock);
+#include "wtcpserver.h"
+// #include "ltcpserver.h"
+void clntHander(WTCPServer * server, SOCKET clntSock);
+// void clntHander(LTCPServer * server, int clntSock);
 
 int main(int, char**) {
-    std::vector<std::thread> threadPool;
-    // WTCPServer * server = new WTCPServer();
-    LTCPServer * server = new LTCPServer();
+    WTCPServer * server = new WTCPServer();
+    // LTCPServer * server = new LTCPServer();
     server->start();
 
     while (true)
     {
         std::cout << "waiting for clients.." << std::endl;
-        // SOCKET clntSock = server->acceptClient();
-        int clntSock = server->acceptClient();
+        SOCKET clntSock = server->acceptClient();
+        // int clntSock = server->acceptClient();
         std::cout << clntSock << std::endl;
         std::thread clntThread(clntHander, server, clntSock);
         clntThread.detach();
     }
 }
 
-// void clntHander(WTCPServer * server, SOCKET clntSock)
-void clntHander(LTCPServer * server, int clntSock)
+void clntHander(WTCPServer * server, SOCKET clntSock)
+// void clntHander(LTCPServer * server, int clntSock)
 {
     while (true)
     {
