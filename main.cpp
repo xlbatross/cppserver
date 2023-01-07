@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include "db.h"
 #include "wtcpserver.h"
 // #include "ltcpserver.h"
 void clntHander(WTCPServer * server, SOCKET clntSock);
@@ -17,6 +18,10 @@ int main(int, char**) {
         std::thread clntThread(clntHander, server, clntSock);
         clntThread.detach();
     }
+    
+    delete server;
+
+    return 0;
 }
 
 void clntHander(WTCPServer * server, SOCKET clntSock)
@@ -25,22 +30,19 @@ void clntHander(WTCPServer * server, SOCKET clntSock)
     while (true)
     {
         Decode * dcd = NULL;
+        Encode * ecd = NULL;
         server->receiveData(clntSock, dcd);
 
         if (dcd == NULL)
             break;
-        std::cout << dcd->Type() << std::endl;
-        switch(dcd->Type())
+        
+        server->processData(clntSock, dcd, ecd);
+        if (ecd != NULL)
         {
-        case Decode::Chat:
-        {
-          DecodeChat chat((DecodeTCP *)dcd);
-          std::cout << "client : " << chat.Msg() << std::endl;
-          EncodeChat ecd(chat.Msg());
-          server->sendData(clntSock, &ecd); 
-        } break;
+            server->sendData(clntSock, ecd);
+            delete ecd;
         }
-
+        
         delete dcd;
     }
 }

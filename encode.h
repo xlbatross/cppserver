@@ -10,13 +10,14 @@ using std::string;
 class Encode
 {
 public:
-    enum EncodeType {Chat};
+    enum EncodeType {Chat, LoginResult, RegistResult};
     Encode();
     ~Encode();
 
     virtual void packaging(const int type) = 0;
 
     const int Type();
+
     const int HeaderSize();
     const char * HeaderBytes();
 
@@ -41,10 +42,23 @@ public:
     void packaging(const int type) override;
 };
 
-class EncodeChat: public EncodeTCP
+class EcdChat: public EncodeTCP
 {
 public:
-    EncodeChat(const string & msg);
+    EcdChat(const string & name, const string & msg);
 };
+
+class EcdLoginResult : public EncodeTCP
+{
+public:
+    EcdLoginResult(const int loginState);
+};
+
+class EcdRegistResult : public EncodeTCP
+{
+public:
+    EcdRegistResult(const int registState);
+};
+
 
 #endif // ENCODE_H

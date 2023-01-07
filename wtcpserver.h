@@ -7,6 +7,7 @@
 #include <iostream>
 #include "decode.h"
 #include "encode.h"
+#include "db.h"
 
 class WTCPServer
 {
@@ -19,15 +20,18 @@ public:
 
     bool receiveData(const SOCKET clntSock, Decode * & dcd);
     bool sendData(const SOCKET clntSock, Encode * ecd);
+    bool processData(const SOCKET clntSock, Decode * dcd, Encode * & ecd);
 
 private:
     std::mutex m;
+
+    DB * db;
 
     WSADATA wsaData;
 
     SOCKET servSock;
     SOCKADDR_IN servAddr;
-    
+
     std::map<SOCKET, std::string> clients;
 
     int receiveBytes(const SOCKET clntSock, char * & rawData);

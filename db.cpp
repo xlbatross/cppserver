@@ -138,7 +138,7 @@ int DB::getUsrInfoList(vector<vector<string>> & list)
     return returnValue;
 }
 
-int DB::insertUsrInfo(const string & id, const string & pw, const string & name)
+int DB::regist(const string & id, const string & pw, const string & name)
 {
     MYSQL * conn = NULL;
     MYSQL_RES * result = NULL;

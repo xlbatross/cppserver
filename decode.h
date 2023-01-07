@@ -10,8 +10,9 @@ using std::string;
 class Decode
 {
 public:
-    enum Type {Chat};
+    enum Type {Chat, Login, Regist};
     Decode();
+    
     const int Type();
     const vector<vector<char>> & DataBytesList();
 
@@ -26,13 +27,39 @@ public:
     DecodeTCP(const char * rawData);
 };
 
-class DecodeChat
+class DcdChat
 {
 public:
-    DecodeChat(DecodeTCP * dcdtcp);
+    DcdChat(DecodeTCP * dcdtcp);
     const string Msg();
 private:
     string msg;
+};
+
+class DcdLogin
+{
+public:
+    DcdLogin(DecodeTCP * dcdtcp);
+    const string Id();
+    const string Pw();
+
+private:
+    string id;
+    string pw;
+};
+
+class DcdRegist
+{
+public:
+    DcdRegist(DecodeTCP * dcdtcp);
+    const string Id();
+    const string Pw();
+    const string Name();
+
+private:
+    string id;
+    string pw;
+    string name;
 };
 // class ReqChat
 // {

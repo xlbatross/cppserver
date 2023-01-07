@@ -5,13 +5,17 @@ WTCPServer::WTCPServer()
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 
     servSock = socket(PF_INET, SOCK_STREAM, 0);
+
+    db = new DB();
 }
 
 WTCPServer::~WTCPServer()
 {
+    delete db;
     closesocket(servSock);
     WSACleanup();
 }
+
 
 void WTCPServer::start(int port)
 {
@@ -109,12 +113,56 @@ bool WTCPServer::sendData(const SOCKET clntSock, Encode * ecd)
         m.lock();
         for (std::map<SOCKET, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
         {
-            if(sendBytes(Iter->first, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize()) != -1)
+            if(Iter->second != "" && sendBytes(Iter->first, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize()) != -1)
                 totalSendCount += 1;
         }
         m.unlock();
     } break;
+    case Encode::LoginResult:
+    case Encode::RegistResult:
+    {
+        totalSendCount = sendBytes(clntSock, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize());
+    } break;
     }
 
     return (totalSendCount != -1);
+}
+
+bool WTCPServer::processData(const SOCKET clntSock, Decode * dcd, Encode * & ecd)
+{
+    switch(dcd->Type())
+    {
+        case Decode::Chat:
+        {
+            DcdChat chat((DecodeTCP *)dcd);
+            ecd = (Encode *)(new EcdChat("dd", chat.Msg()));
+        } break;
+
+        case Decode::Login:
+        {
+            DcdLogin login((DecodeTCP *)dcd);
+            string name = "";
+            int loginState = db->login(login.Id(), login.Pw(), name);
+            m.lock();
+            for (std::map<SOCKET, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
+            {
+                if (name == Iter->second)
+                {
+                    loginState = -2;
+                    break;
+                }
+            }
+            m.unlock();
+            ecd = (Encode *)(new EcdLoginResult(loginState));
+        } break;
+
+        case Decode::Regist:
+        {
+            DcdRegist regist((DecodeTCP *)dcd);
+            int registState = db->regist(regist.Id(), regist.Pw(), regist.Name());
+            ecd = (Encode *)(new EcdRegistResult(registState));
+        } break;
+    }
+
+    return true;
 }

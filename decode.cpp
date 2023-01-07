@@ -52,14 +52,52 @@ DecodeTCP::DecodeTCP(const char * rawData)
     }
 }
 
-DecodeChat::DecodeChat(DecodeTCP *dcdtcp)
+DcdChat::DcdChat(DecodeTCP *dcdtcp)
 {
     msg.append(dcdtcp->DataBytesList()[0].data(), dcdtcp->DataBytesList()[0].size());
 }
 
-const string DecodeChat::Msg()
+const string DcdChat::Msg()
 {
     return msg;
+}
+
+DcdLogin::DcdLogin(DecodeTCP *dcdtcp)
+{
+    id.append(dcdtcp->DataBytesList()[0].data(), dcdtcp->DataBytesList()[0].size());
+    pw.append(dcdtcp->DataBytesList()[1].data(), dcdtcp->DataBytesList()[1].size());
+}
+
+const string DcdLogin::Id()
+{
+    return id;
+}
+
+const string DcdLogin::Pw()
+{
+    return pw;
+}
+
+DcdRegist::DcdRegist(DecodeTCP *dcdtcp)
+{
+    id.append(dcdtcp->DataBytesList()[0].data(), dcdtcp->DataBytesList()[0].size());
+    pw.append(dcdtcp->DataBytesList()[1].data(), dcdtcp->DataBytesList()[1].size());
+    name.append(dcdtcp->DataBytesList()[2].data(), dcdtcp->DataBytesList()[2].size());
+}
+
+const string DcdRegist::Id()
+{
+    return id;
+}
+
+const string DcdRegist::Pw()
+{
+    return pw;
+}
+
+const string DcdRegist::Name()
+{
+    return name;
 }
 
 // // udp start

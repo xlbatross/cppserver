@@ -20,7 +20,7 @@ public:
     ~DB();
 
     int getUsrInfoList(vector<vector<string>> & list);
-    int insertUsrInfo(const string & id, const string & pw, const string & name);
+    int regist(const string & id, const string & pw, const string & name);
     int login(const string & id, const string & pw, string & name);
 
 private:
