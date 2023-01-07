@@ -9,6 +9,7 @@
 #include <iostream>
 #include "decode.h"
 #include "encode.h"
+#include "db.h"
 
 class LTCPServer
 {
@@ -19,11 +20,14 @@ public:
     void start(int port = 2500);
     int acceptClient();
     
-    bool receiveData(const int clntSock, Decode * & dcd);
-    bool sendData(const int clntSock, Encode * ecd);
+    void receiveData(const int clntSock, Decode * & dcd);
+    void sendData(const int clntSock, Encode * ecd);
+    void processData(const int clntSock, Decode * dcd, Encode * & ecd);
     
 private:
     std::mutex m;
+
+    DB * db;
 
     int servSock;
     struct sockaddr_in servAddr;

@@ -23,15 +23,15 @@ DecodeTCP::DecodeTCP(const char * rawData)
     int dataLength = 0;
     vector<int> dataLengthList;
 
-    // Ã³À½ 4¹ÙÀÌÆ®´Â Çì´õÀÇ ±æÀÌ
+    // ì²˜ìŒ 4ë°”ì´íŠ¸ëŠ” í—¤ë”ì˜ ê¸¸ì´
     memcpy(&headerSize, rawData + pointer, sizeof(int));
     pointer += sizeof(int);
 
-    // ´ÙÀ½ 4¹ÙÀÌÆ®´Â ¿äÃ» ¶Ç´Â ÀÀ´ä Å¸ÀÔ
+    // ë‹¤ìŒ 4ë°”ì´íŠ¸ëŠ” ìš”ì²­ ë˜ëŠ” ì‘ë‹µ íƒ€ì…
     memcpy(&type, rawData + pointer, sizeof(int));
     pointer += sizeof(int);
 
-    // ´ÙÀ½ 4¹ÙÀÌÆ®ºÎÅÍ Çì´õ ³¡±îÁö´Â ÀÇ¹ÌÀÖ´Â µ¥ÀÌÅÍ ÇÏ³ªÀÇ ±æÀÌ°ªµé
+    // ë‹¤ìŒ 4ë°”ì´íŠ¸ë¶€í„° í—¤ë” ëê¹Œì§€ëŠ” ì˜ë¯¸ìˆëŠ” ë°ì´í„° í•˜ë‚˜ì˜ ê¸¸ì´ê°’ë“¤
     for (int i = 0; i < headerSize - sizeof(int); i += sizeof(int))
     {
         memcpy(&dataLength, rawData + pointer, sizeof(int));
@@ -41,7 +41,7 @@ DecodeTCP::DecodeTCP(const char * rawData)
 
     if (dataLengthList.size() > 0)
     {
-        // ³²Àº ·Î¿ìµ¥ÀÌÅÍ¸¦ ÀÇ¹ÌÀÖ´Â µ¥ÀÌÅÍµé·Î º¯È¯
+        // ë‚¨ì€ ë¡œìš°ë°ì´í„°ë¥¼ ì˜ë¯¸ìˆëŠ” ë°ì´í„°ë“¤ë¡œ ë³€í™˜
         for (int i = 0; i < dataLengthList.size(); i++)
         {
             vector<char> dataBytes(dataLengthList[i]);

@@ -3,10 +3,13 @@
 LTCPServer::LTCPServer()
 {
     servSock = socket(PF_INET, SOCK_STREAM, 0);
+    
+    db = new DB();
 }
 
 LTCPServer::~LTCPServer()
 {
+    delete db;
     close(servSock);
 }
 
@@ -38,13 +41,13 @@ int LTCPServer::acceptClient()
 int LTCPServer::receiveBytes(const int clntSock, char * & rawData)
 {
     char dataSizeBuffer[4];
-    // 4¹ÙÀÌÆ®¸¦ ¸ÕÀú ÀĞ¾î, ÃÑ µ¥ÀÌÅÍÀÇ ±æÀÌ¸¦ ÆÄ¾ÇÇÑ´Ù
+    // 4ë°”ì´íŠ¸ë¥¼ ë¨¼ì € ì½ì–´, ì´ ë°ì´í„°ì˜ ê¸¸ì´ë¥¼ íŒŒì•…í•œë‹¤
     int readBytes = read(clntSock, dataSizeBuffer, 4);
     if (readBytes <= 0)
         return -1;
 
-    // ÃÑ µ¥ÀÌÅÍ ±æÀÌ´Â Çì´õÀÇ ±æÀÌ(4¹ÙÀÌÆ®) + Çì´õ + ½ÇÁ¦ µ¥ÀÌÅÍ
-    // Çì´õ´Â ¿äÃ» ÀÀ´ä Å¸ÀÔ(4¹ÙÀÌÆ®) + ½ÇÁ¦ µ¥ÀÌÅÍ ÇÏ³ªÀÇ ±æÀÌ°ª(4¹ÙÀÌÆ®) * Çì´õÀÇ ±æÀÌ - 1
+    // ì´ ë°ì´í„° ê¸¸ì´ëŠ” í—¤ë”ì˜ ê¸¸ì´(4ë°”ì´íŠ¸) + í—¤ë” + ì‹¤ì œ ë°ì´í„°
+    // í—¤ë”ëŠ” ìš”ì²­ ì‘ë‹µ íƒ€ì…(4ë°”ì´íŠ¸) + ì‹¤ì œ ë°ì´í„° í•˜ë‚˜ì˜ ê¸¸ì´ê°’(4ë°”ì´íŠ¸) * í—¤ë”ì˜ ê¸¸ì´ - 1
     int totalRecvSize = 0;
     int packetSize = 0; 
     int totalDataSize = *((int *)dataSizeBuffer);
@@ -80,7 +83,7 @@ int LTCPServer::sendBytes(const int clntSock, const char *headerBytes, const int
     return totalSendSize;
 }
 
-bool LTCPServer::receiveData(const int clntSock, Decode * & dcd)
+void LTCPServer::receiveData(const int clntSock, Decode * & dcd)
 {
     char * rawData = NULL;
     bool isSuccess = false;
@@ -91,13 +94,20 @@ bool LTCPServer::receiveData(const int clntSock, Decode * & dcd)
         isSuccess = true;
         dcd = (Decode *)(new DecodeTCP(rawData));
     }
+    else
+    {
+        m.lock();
+        if (clients.find(clntSock) != clients.end())
+            clients.erase(clntSock);
+        m.unlock();
+        close(clntSock);
+    }
     if (rawData != NULL)
         delete [] rawData;
-    return isSuccess;
 }
 
 
-bool LTCPServer::sendData(const int clntSock, Encode * ecd)
+void LTCPServer::sendData(const int clntSock, Encode * ecd)
 {
     int totalSendCount = 0;
     switch(ecd->Type())
@@ -107,12 +117,52 @@ bool LTCPServer::sendData(const int clntSock, Encode * ecd)
         m.lock();
         for (std::map<int, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
         {
-            if(sendBytes(Iter->first, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize()) != -1)
+            if(Iter->second != "" && sendBytes(Iter->first, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize()) != -1)
                 totalSendCount += 1;
         }
         m.unlock();
     } break;
+    case Encode::LoginResult:
+    case Encode::RegistResult:
+    {
+        totalSendCount = sendBytes(clntSock, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize());
+    } break;
     }
+}
 
-    return (totalDataSize != -1);
+void LTCPServer::processData(const int clntSock, Decode * dcd, Encode * & ecd)
+{
+    switch(dcd->Type())
+    {
+        case Decode::Chat:
+        {
+            DcdChat chat((DecodeTCP *)dcd);
+            ecd = (Encode *)(new EcdChat("dd", chat.Msg()));
+        } break;
+
+        case Decode::Login:
+        {
+            DcdLogin login((DecodeTCP *)dcd);
+            string name = "";
+            int loginState = db->login(login.Id(), login.Pw(), name);
+            m.lock();
+            for (std::map<int, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
+            {
+                if (name == Iter->second)
+                {
+                    loginState = -2;
+                    break;
+                }
+            }
+            m.unlock();
+            ecd = (Encode *)(new EcdLoginResult(loginState));
+        } break;
+
+        case Decode::Regist:
+        {
+            DcdRegist regist((DecodeTCP *)dcd);
+            int registState = db->regist(regist.Id(), regist.Pw(), regist.Name());
+            ecd = (Encode *)(new EcdRegistResult(registState));
+        } break;
+    }
 }

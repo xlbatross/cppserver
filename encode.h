@@ -12,7 +12,7 @@ class Encode
 public:
     enum EncodeType {Chat, LoginResult, RegistResult};
     Encode();
-    ~Encode();
+    virtual ~Encode();
 
     virtual void packaging(const int type) = 0;
 
@@ -25,14 +25,15 @@ public:
     const char * DataBytes();
 
 protected:
-    int type = -1;
     vector<vector<char>> dataBytesList;
 
-    int headerSize = 0;
-    char * headerBytes = NULL;
+    int type;
+
+    int headerSize;
+    char * headerBytes;
     
-    int dataSize = 0;
-    char * dataBytes = NULL;
+    int dataSize;
+    char * dataBytes;
 };
 
 class EncodeTCP : public Encode

@@ -2,7 +2,13 @@
 
 Encode::Encode()
 {
+    type = -1;
 
+    headerSize = 0;
+    headerBytes = NULL;
+    
+    dataSize = 0;
+    dataBytes = NULL;
 }
 
 Encode::~Encode()
@@ -51,13 +57,13 @@ void EncodeTCP::packaging(const int type)
     int dataPointer = 0;
     this->type = type;
 
-    // Çì´õ
-    // Çì´õÀÇ ±æÀÌ(4¹ÙÀÌÆ® Á¤¼öÇü, ÀÌ ±æÀÌ°ªÀº ÀÌ µÚ¿¡ ¿À´Â µ¥ÀÌÅÍÀÇ ±æÀÌ¸¦ ÀÇ¹ÌÇÑ´Ù.)
-    //  + ¿äÃ» Å¸ÀÔ(4¹ÙÀÌÆ® Á¤¼öÇü) + µ¥ÀÌÅÍ ÇÏ³ªÀÇ ¹ÙÀÌÆ® ±æÀÌ(4¹ÙÀÌÆ® Á¤¼öÇü) * ((Çì´õÀÇ ±æÀÌ / 4¹ÙÀÌÆ®) - 1)
+    // í—¤ë”
+    // í—¤ë”ì˜ ê¸¸ì´(4ë°”ì´íŠ¸ ì •ìˆ˜í˜•, ì´ ê¸¸ì´ê°’ì€ ì´ ë’¤ì— ì˜¤ëŠ” ë°ì´í„°ì˜ ê¸¸ì´ë¥¼ ì˜ë¯¸í•œë‹¤.)
+    //  + ìš”ì²­ íƒ€ìž…(4ë°”ì´íŠ¸ ì •ìˆ˜í˜•) + ë°ì´í„° í•˜ë‚˜ì˜ ë°”ì´íŠ¸ ê¸¸ì´(4ë°”ì´íŠ¸ ì •ìˆ˜í˜•) * ((í—¤ë”ì˜ ê¸¸ì´ / 4ë°”ì´íŠ¸) - 1)
     headerVector.push_back(type);
     for (int i = 0; i < dataBytesList.size(); i++)
     {
-        // µ¥ÀÌÅÍ ÇÏ³ªÀÇ ¹ÙÀÌÆ® ±æÀÌ (4¹ÙÀÌÆ® Á¤¼öÇü)
+        // ë°ì´í„° í•˜ë‚˜ì˜ ë°”ì´íŠ¸ ê¸¸ì´ (4ë°”ì´íŠ¸ ì •ìˆ˜í˜•)
         headerVector.push_back(dataBytesList[i].size());
         dataSize += dataBytesList[i].size();
     }
@@ -69,7 +75,7 @@ void EncodeTCP::packaging(const int type)
     memcpy(headerBytes, &realHeaderSize, sizeof(int));
     memcpy(headerBytes + sizeof(int), (char *)headerVector.data(), realHeaderSize);
 
-    // µ¥ÀÌÅÍ
+    // ë°ì´í„°
     dataBytes = new char[dataSize];
     for (int i = 0; i < dataBytesList.size(); i++)
     {
