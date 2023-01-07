@@ -13,6 +13,11 @@ Encode::~Encode()
         delete [] dataBytes;
 }
 
+const int Encode::Type()
+{
+    return type;
+}
+
 const int Encode::HeaderSize()
 {
     return headerSize;
@@ -44,6 +49,7 @@ void EncodeTCP::packaging(const int type)
     vector<int> headerVector;
     int realHeaderSize = 0;
     int dataPointer = 0;
+    this->type = type;
 
     // 헤더
     // 헤더의 길이(4바이트 정수형, 이 길이값은 이 뒤에 오는 데이터의 길이를 의미한다.)

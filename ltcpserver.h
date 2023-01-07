@@ -13,23 +13,25 @@
 class LTCPServer
 {
 public:
-    std::mutex m;
-
     LTCPServer();
     ~LTCPServer();
 
     void start(int port = 2500);
     int acceptClient();
-    int receiveBytes(const int clntSock, char * & rawData);
+    
     bool receiveData(const int clntSock, Decode * & dcd);
-    int sendBytes(const int clntSock, const char *headerBytes, const int headerSize, const char *dataBytes, const int dataSize);
     bool sendData(const int clntSock, Encode * ecd);
     
 private:
+    std::mutex m;
+
     int servSock;
     struct sockaddr_in servAddr;
 
-    std::map<int, struct sockaddr_in> clients;
+    std::map<int, std::string> clients;
+
+    int receiveBytes(const int clntSock, char * & rawData);
+    int sendBytes(const int clntSock, const char *headerBytes, const int headerSize, const char *dataBytes, const int dataSize);
 };
 
 #endif // WTCPSERVER_H

@@ -10,12 +10,13 @@ using std::string;
 class Encode
 {
 public:
-    enum Type {Chat};
+    enum EncodeType {Chat};
     Encode();
     ~Encode();
 
     virtual void packaging(const int type) = 0;
 
+    const int Type();
     const int HeaderSize();
     const char * HeaderBytes();
 
@@ -23,6 +24,7 @@ public:
     const char * DataBytes();
 
 protected:
+    int type = -1;
     vector<vector<char>> dataBytesList;
 
     int headerSize = 0;

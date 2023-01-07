@@ -28,7 +28,9 @@ int LTCPServer::acceptClient()
     int clntSock = accept(servSock, (struct sockaddr *)&clntAddr, &sz_clntAddr);
     if (clntSock != -1)
     {
-        clients[clntSock] = clntAddr;
+        m.lock();
+        clients[clntSock] = "";
+        m.unlock();
     }
     return clntSock;
 }
@@ -38,7 +40,7 @@ int LTCPServer::receiveBytes(const int clntSock, char * & rawData)
     char dataSizeBuffer[4];
     // 4바이트를 먼저 읽어, 총 데이터의 길이를 파악한다
     int readBytes = read(clntSock, dataSizeBuffer, 4);
-    if (readBytes == -1)
+    if (readBytes <= 0)
         return -1;
 
     // 총 데이터 길이는 헤더의 길이(4바이트) + 헤더 + 실제 데이터
@@ -51,28 +53,13 @@ int LTCPServer::receiveBytes(const int clntSock, char * & rawData)
     {
         packetSize = (totalRecvSize + 1024 < totalDataSize) ? 1024 : totalDataSize - totalRecvSize;
         readBytes = read(clntSock, rawData + totalRecvSize, packetSize);
-        if (readBytes == -1)
+        if (readBytes <= 0)
             return -1;
         totalRecvSize += readBytes;
     }
     return totalRecvSize;
 }
 
-bool LTCPServer::receiveData(const int clntSock, Decode * & dcd)
-{
-    char * rawData = NULL;
-    bool isSuccess = false;
-    int totalDataSize = receiveBytes(clntSock, rawData);
-
-    if (totalDataSize != -1)
-    {
-        isSuccess = true;
-        dcd = (Decode *)(new DecodeTCP(rawData));
-    }
-    if (rawData != NULL)
-        delete [] rawData;
-    return isSuccess;
-}
 
 int LTCPServer::sendBytes(const int clntSock, const char *headerBytes, const int headerSize, const char *dataBytes, const int dataSize)
 {
@@ -93,9 +80,39 @@ int LTCPServer::sendBytes(const int clntSock, const char *headerBytes, const int
     return totalSendSize;
 }
 
+bool LTCPServer::receiveData(const int clntSock, Decode * & dcd)
+{
+    char * rawData = NULL;
+    bool isSuccess = false;
+    int totalDataSize = receiveBytes(clntSock, rawData);
+
+    if (totalDataSize != -1)
+    {
+        isSuccess = true;
+        dcd = (Decode *)(new DecodeTCP(rawData));
+    }
+    if (rawData != NULL)
+        delete [] rawData;
+    return isSuccess;
+}
+
+
 bool LTCPServer::sendData(const int clntSock, Encode * ecd)
 {
-    int totalDataSize = sendBytes(clntSock, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize());
+    int totalSendCount = 0;
+    switch(ecd->Type())
+    {
+    case Encode::Chat:
+    {
+        m.lock();
+        for (std::map<int, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
+        {
+            if(sendBytes(Iter->first, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize()) != -1)
+                totalSendCount += 1;
+        }
+        m.unlock();
+    } break;
+    }
 
     return (totalDataSize != -1);
 }

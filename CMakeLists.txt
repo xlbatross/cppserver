@@ -19,15 +19,25 @@ if(WIN32)
         wtcpserver.h
         wtcpserver.cpp
     )
+    set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR "C:/Program Files/MariaDB/MariaDB Connector C 64-bit")
+    include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
+    link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
+    set(CONNECT_LIB ${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib/libmariadb.lib)
 elseif(APPLE)
     set(MAC_SOURCES
         ltcpserver.h
         ltcpserver.cpp
     )
+    set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR "/opt/homebrew/Cellar/mariadb-connector-c/3.3.3")
+    include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include/mariadb)
+    link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib/mariadb)
+    set(CONNECT_LIB ${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib/mariadb/libmariadb.dylib)
 endif()
 
 add_executable(${PROJECT_NAME} 
     main.cpp
+    db.h
+    db.cpp
     encode.h
     encode.cpp
     decode.h
@@ -38,6 +48,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} 
     ${LIBOPENCV}
     ${OpenCV_LIBRARIES}
+    ${CONNECT_LIB}
 )
 if(WIN32)
   target_link_libraries(${PROJECT_NAME} wsock32 ws2_32)

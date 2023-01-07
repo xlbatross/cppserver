@@ -14,7 +14,6 @@ int main(int, char**) {
         std::cout << "waiting for clients.." << std::endl;
         SOCKET clntSock = server->acceptClient();
         // int clntSock = server->acceptClient();
-        std::cout << clntSock << std::endl;
         std::thread clntThread(clntHander, server, clntSock);
         clntThread.detach();
     }
@@ -30,7 +29,7 @@ void clntHander(WTCPServer * server, SOCKET clntSock)
 
         if (dcd == NULL)
             break;
-
+        std::cout << dcd->Type() << std::endl;
         switch(dcd->Type())
         {
         case Decode::Chat:

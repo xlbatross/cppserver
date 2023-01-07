@@ -31,7 +31,9 @@ SOCKET WTCPServer::acceptClient()
     SOCKET clntSock = accept(servSock, (SOCKADDR *)&clntAddr, &sz_clntAddr);
     if (clntSock != INVALID_SOCKET)
     {
-        clients[clntSock] = clntAddr;
+        m.lock();
+        clients[clntSock] = "";
+        m.unlock();
     }
     return clntSock;
 }
@@ -41,7 +43,7 @@ int WTCPServer::receiveBytes(const SOCKET clntSock, char * & rawData)
     char dataSizeBuffer[4];
     // 4바이트를 먼저 읽어, 총 데이터의 길이를 파악한다
     int readBytes = recv(clntSock, dataSizeBuffer, 4, 0);
-    if (readBytes == SOCKET_ERROR)
+    if (readBytes <= 0)
         return -1;
 
     // 총 데이터 길이는 헤더의 길이(4바이트) + 헤더 + 실제 데이터
@@ -54,27 +56,11 @@ int WTCPServer::receiveBytes(const SOCKET clntSock, char * & rawData)
     {
         packetSize = (totalRecvSize + 1024 < totalDataSize) ? 1024 : totalDataSize - totalRecvSize;
         readBytes = recv(clntSock, rawData + totalRecvSize, packetSize, 0);
-        if (readBytes == SOCKET_ERROR)
+        if (readBytes <= 0)
             return -1;
         totalRecvSize += readBytes;
     }
     return totalRecvSize;
-}
-
-bool WTCPServer::receiveData(const SOCKET clntSock, Decode * & dcd)
-{
-    char * rawData = NULL;
-    bool isSuccess = false;
-    int totalDataSize = receiveBytes(clntSock, rawData);
-
-    if (totalDataSize != -1)
-    {
-        isSuccess = true;
-        dcd = (Decode *)(new DecodeTCP(rawData));
-    }
-    if (rawData != NULL)
-        delete [] rawData;
-    return isSuccess;
 }
 
 int WTCPServer::sendBytes(const SOCKET clntSock, const char *headerBytes, const int headerSize, const char *dataBytes, const int dataSize)
@@ -96,9 +82,39 @@ int WTCPServer::sendBytes(const SOCKET clntSock, const char *headerBytes, const 
     return totalSendSize;
 }
 
+bool WTCPServer::receiveData(const SOCKET clntSock, Decode * & dcd)
+{
+    char * rawData = NULL;
+    bool isSuccess = false;
+    int totalDataSize = receiveBytes(clntSock, rawData);
+
+    if (totalDataSize != -1)
+    {
+        isSuccess = true;
+        dcd = (Decode *)(new DecodeTCP(rawData));
+    }
+    if (rawData != NULL)
+        delete [] rawData;
+    
+    return isSuccess;
+}
+
 bool WTCPServer::sendData(const SOCKET clntSock, Encode * ecd)
 {
-    int totalDataSize = sendBytes(clntSock, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize());
+    int totalSendCount = 0;
+    switch(ecd->Type())
+    {
+    case Encode::Chat:
+    {
+        m.lock();
+        for (std::map<SOCKET, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
+        {
+            if(sendBytes(Iter->first, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize()) != -1)
+                totalSendCount += 1;
+        }
+        m.unlock();
+    } break;
+    }
 
-    return (totalDataSize != -1);
+    return (totalSendCount != -1);
 }
