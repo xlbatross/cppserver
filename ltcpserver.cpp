@@ -155,12 +155,15 @@ void LTCPServer::processData(const int clntSock, Decode * dcd, Encode * & ecd)
             string name = "";
             int loginState = db->login(login.Id(), login.Pw(), name);
             m.lock();
-            for (std::map<int, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
+            if (name != "")
             {
-                if (name == Iter->second)
+                for (std::map<int, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
                 {
-                    loginState = -2;
-                    break;
+                    if (name == Iter->second)
+                    {
+                        loginState = -2;
+                        break;
+                    }
                 }
             }
             
