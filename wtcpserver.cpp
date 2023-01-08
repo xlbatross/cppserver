@@ -16,7 +16,6 @@ WTCPServer::~WTCPServer()
     WSACleanup();
 }
 
-
 void WTCPServer::start(int port)
 {
     memset(&servAddr, 0, sizeof(servAddr));
@@ -36,7 +35,9 @@ SOCKET WTCPServer::acceptClient()
     if (clntSock != INVALID_SOCKET)
     {
         m.lock();
+        std::cout << clntSock << " connect" << std::endl;
         clients[clntSock] = "";
+        std::cout << "clients : " << clients.size() << std::endl;
         m.unlock();
     }
     return clntSock;
@@ -86,7 +87,7 @@ int WTCPServer::sendBytes(const SOCKET clntSock, const char *headerBytes, const 
     return totalSendSize;
 }
 
-bool WTCPServer::receiveData(const SOCKET clntSock, Decode * & dcd)
+void WTCPServer::receiveData(const SOCKET clntSock, Decode * & dcd)
 {
     char * rawData = NULL;
     bool isSuccess = false;
@@ -97,13 +98,21 @@ bool WTCPServer::receiveData(const SOCKET clntSock, Decode * & dcd)
         isSuccess = true;
         dcd = (Decode *)(new DecodeTCP(rawData));
     }
+    else
+    {
+        m.lock();
+        std::cout << clntSock << " disconnect" << std::endl;
+        if (clients.find(clntSock) != clients.end())
+            clients.erase(clntSock);
+        std::cout << "clients : " << clients.size() << std::endl;
+        closesocket(clntSock);
+        m.unlock();
+    }
     if (rawData != NULL)
         delete [] rawData;
-    
-    return isSuccess;
 }
 
-bool WTCPServer::sendData(const SOCKET clntSock, Encode * ecd)
+void WTCPServer::sendData(const SOCKET clntSock, Encode * ecd)
 {
     int totalSendCount = 0;
     switch(ecd->Type())
@@ -124,33 +133,50 @@ bool WTCPServer::sendData(const SOCKET clntSock, Encode * ecd)
         totalSendCount = sendBytes(clntSock, ecd->HeaderBytes(), ecd->HeaderSize(), ecd->DataBytes(), ecd->DataSize());
     } break;
     }
-
-    return (totalSendCount != -1);
 }
 
-bool WTCPServer::processData(const SOCKET clntSock, Decode * dcd, Encode * & ecd)
+void WTCPServer::processData(const SOCKET clntSock, Decode * dcd, Encode * & ecd)
 {
     switch(dcd->Type())
     {
         case Decode::Chat:
         {
+            std::cout << clntSock << " Chat" << std::endl; 
             DcdChat chat((DecodeTCP *)dcd);
-            ecd = (Encode *)(new EcdChat("dd", chat.Msg()));
+            m.lock();
+            if (clients.find(clntSock) != clients.end())
+                ecd = (Encode *)(new EcdChat(clients[clntSock], chat.Msg()));
+            m.unlock();
         } break;
 
         case Decode::Login:
         {
+            std::cout << clntSock << " Login" << std::endl;
             DcdLogin login((DecodeTCP *)dcd);
             string name = "";
             int loginState = db->login(login.Id(), login.Pw(), name);
             m.lock();
-            for (std::map<SOCKET, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
+            if (name != "")
             {
-                if (name == Iter->second)
+                for (std::map<SOCKET, std::string>::iterator Iter = clients.begin(); Iter != clients.end(); Iter++)
                 {
-                    loginState = -2;
-                    break;
+                    if (name == Iter->second)
+                    {
+                        loginState = -2;
+                        break;
+                    }
                 }
+            }
+            
+            if (loginState == 1)
+            {
+                std::cout << clntSock << " loginSuccess" << std::endl;
+                clients[clntSock] = name;
+                std::cout << clntSock << " name : " << clients[clntSock] << std::endl;
+            }
+            else
+            {
+                std::cout << clntSock << " loginFailed " << loginState << std::endl;
             }
             m.unlock();
             ecd = (Encode *)(new EcdLoginResult(loginState));
@@ -158,11 +184,19 @@ bool WTCPServer::processData(const SOCKET clntSock, Decode * dcd, Encode * & ecd
 
         case Decode::Regist:
         {
+            std::cout << clntSock << " Regist" << std::endl;
             DcdRegist regist((DecodeTCP *)dcd);
             int registState = db->regist(regist.Id(), regist.Pw(), regist.Name());
             ecd = (Encode *)(new EcdRegistResult(registState));
         } break;
-    }
 
-    return true;
+        case Decode::Logout:
+        {
+            std::cout << clntSock << " Logout" << std::endl;
+            m.lock();
+            if (clients.find(clntSock) != clients.end())
+                clients[clntSock] = "";
+            m.unlock();
+        } break;
+    }
 }

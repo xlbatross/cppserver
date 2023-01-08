@@ -10,7 +10,7 @@ using std::string;
 class Decode
 {
 public:
-    enum Type {Chat, Login, Regist};
+    enum Type {Chat, Login, Regist, Logout};
     Decode();
     
     const int Type();

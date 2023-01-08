@@ -18,9 +18,9 @@ public:
     void start(int port = 2500);
     SOCKET acceptClient();
 
-    bool receiveData(const SOCKET clntSock, Decode * & dcd);
-    bool sendData(const SOCKET clntSock, Encode * ecd);
-    bool processData(const SOCKET clntSock, Decode * dcd, Encode * & ecd);
+    void receiveData(const SOCKET clntSock, Decode * & dcd);
+    void sendData(const SOCKET clntSock, Encode * ecd);
+    void processData(const SOCKET clntSock, Decode * dcd, Encode * & ecd);
 
 private:
     std::mutex m;

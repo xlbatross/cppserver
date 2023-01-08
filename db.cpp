@@ -104,7 +104,7 @@ bool DB::mapResult(MYSQL_RES * result, vector<vector<string>> & list)
 
 bool DB::commit(MYSQL * conn)
 {
-    if (!mysql_commit(conn))
+    if (mysql_commit(conn))
     {
         cout << "commit error: " << mysql_error(conn) << endl;
         mysql_rollback(conn);

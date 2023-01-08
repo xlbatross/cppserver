@@ -99,7 +99,6 @@ const string DcdRegist::Name()
 {
     return name;
 }
-
 // // udp start
 // ResponseUDP::ResponseUDP()
 // {

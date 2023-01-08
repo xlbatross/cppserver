@@ -32,7 +32,9 @@ int LTCPServer::acceptClient()
     if (clntSock != -1)
     {
         m.lock();
+        std::cout << clntSock << " connect" << std::endl;
         clients[clntSock] = "";
+        std::cout << "clients : " << clients.size() << std::endl;
         m.unlock();
     }
     return clntSock;
@@ -97,10 +99,12 @@ void LTCPServer::receiveData(const int clntSock, Decode * & dcd)
     else
     {
         m.lock();
+        std::cout << clntSock << " disconnect" << std::endl;
         if (clients.find(clntSock) != clients.end())
             clients.erase(clntSock);
-        m.unlock();
+        std::cout << "clients : " << clients.size() << std::endl;
         close(clntSock);
+        m.unlock();
     }
     if (rawData != NULL)
         delete [] rawData;
@@ -136,12 +140,17 @@ void LTCPServer::processData(const int clntSock, Decode * dcd, Encode * & ecd)
     {
         case Decode::Chat:
         {
+            std::cout << clntSock << " Chat" << std::endl; 
             DcdChat chat((DecodeTCP *)dcd);
-            ecd = (Encode *)(new EcdChat("dd", chat.Msg()));
+            m.lock();
+            if (clients.find(clntSock) != clients.end())
+                ecd = (Encode *)(new EcdChat(clients[clntSock], chat.Msg()));
+            m.unlock();
         } break;
 
         case Decode::Login:
         {
+            std::cout << clntSock << " Login" << std::endl;
             DcdLogin login((DecodeTCP *)dcd);
             string name = "";
             int loginState = db->login(login.Id(), login.Pw(), name);
@@ -154,6 +163,17 @@ void LTCPServer::processData(const int clntSock, Decode * dcd, Encode * & ecd)
                     break;
                 }
             }
+            
+            if (loginState == 1)
+            {
+                std::cout << clntSock << " loginSuccess" << std::endl;
+                clients[clntSock] = name;
+                std::cout << clntSock << " name : " << clients[clntSock] << std::endl;
+            }
+            else
+            {
+                std::cout << clntSock << " loginFailed " << loginState << std::endl;
+            }
             m.unlock();
             ecd = (Encode *)(new EcdLoginResult(loginState));
         } break;
@@ -163,6 +183,15 @@ void LTCPServer::processData(const int clntSock, Decode * dcd, Encode * & ecd)
             DcdRegist regist((DecodeTCP *)dcd);
             int registState = db->regist(regist.Id(), regist.Pw(), regist.Name());
             ecd = (Encode *)(new EcdRegistResult(registState));
+        } break;
+
+        case Decode::Logout:
+        {
+            std::cout << clntSock << " Logout" << std::endl;
+            m.lock();
+            if (clients.find(clntSock) != clients.end())
+                clients[clntSock] = "";
+            m.unlock();
         } break;
     }
 }
