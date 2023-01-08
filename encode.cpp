@@ -52,28 +52,31 @@ EncodeTCP::EncodeTCP()
 
 void EncodeTCP::packaging(const int type)
 {
-    vector<int> headerVector;
-    int realHeaderSize = 0;
+    int realHeaderSize = sizeof(int) * (1 + dataBytesList.size());
+    int headerPointer = 0;
     int dataPointer = 0;
+    int dataBytesSize = 0;
     this->type = type;
 
     // 헤더
     // 헤더의 길이(4바이트 정수형, 이 길이값은 이 뒤에 오는 데이터의 길이를 의미한다.)
     //  + 요청 타입(4바이트 정수형) + 데이터 하나의 바이트 길이(4바이트 정수형) * ((헤더의 길이 / 4바이트) - 1)
-    headerVector.push_back(type);
+    headerSize = sizeof(int) + realHeaderSize;
+    headerBytes = new char[headerSize]();
+    
+    memcpy(headerBytes + headerPointer, (char *)&realHeaderSize, sizeof(int));
+    headerPointer += sizeof(int);
+    
+    memcpy(headerBytes + headerPointer, (char *)&type, sizeof(int));
+    headerPointer += sizeof(int);
+
     for (int i = 0; i < dataBytesList.size(); i++)
     {
-        // 데이터 하나의 바이트 길이 (4바이트 정수형)
-        headerVector.push_back(dataBytesList[i].size());
-        dataSize += dataBytesList[i].size();
+        dataBytesSize = dataBytesList[i].size();
+        memcpy(headerBytes + headerPointer, (char *)&dataBytesSize, sizeof(int));
+        headerPointer += sizeof(int);
+        dataSize += dataBytesSize;
     }
-
-    realHeaderSize = headerVector.size() * sizeof(int);
-    headerSize = sizeof(int) + realHeaderSize;
-
-    headerBytes = new char[headerSize]();
-    memcpy(headerBytes, &realHeaderSize, sizeof(int));
-    memcpy(headerBytes + sizeof(int), (char *)headerVector.data(), realHeaderSize);
 
     // 데이터
     dataBytes = new char[dataSize];
